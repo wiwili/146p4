@@ -69,6 +69,12 @@ def take_best_planet(state):
         while any(owned_planets):
             closest_planet = min(owned_planets, key=lambda p: state.distance(p.ID, target.ID), default=None)
             ships_required = target.num_ships
+            for attacker in state.enemy_fleets():
+                if attacker.destination_planet == target.ID:
+                    ships_required += attacker.num_ships
+                    if target.owner == 0 and attacker.turns_remaining < state.distance(closest_planet.ID, target.ID):
+                        ships_required += (state.distance(closest_planet.ID,target.ID) - attacker.turns_remaining) * target.growth_rate - target.num_ships * 2
+
             if target.owner == 2:
                 ships_required += target.growth_rate * state.distance(closest_planet.ID, target.ID)
             else:
